@@ -1,0 +1,19 @@
+{
+  "name": "songstore",
+  "version": "1.0.0",
+  "description": "A simple app that get previews of songs over Spotify API and save them on a database.",
+  "main": "songStore.js",
+  "scripts": {
+    "start" : "node songStore.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ekremdemirhan/SongStore.git"
+  },
+  "author": "Ekrem Demirhan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ekremdemirhan/SongStore/issues"
+  },
+  "homepage": "https://github.com/ekremdemirhan/SongStore#readme"
+}
