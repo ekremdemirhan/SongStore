@@ -1,7 +1,7 @@
 var config = require('./config.json');
+var dataset = require('./dataset.json');
 var XMLHttpRequest = require('xhr2');
-
-let authorizationToken = null;
+var MongoClient = require('mongodb').MongoClient;
 
 function getAuthorizationToken() {
 
@@ -21,7 +21,7 @@ function getAuthorizationToken() {
 }
 
 function getArtist(token, artistName) {
-    return new Promise(function (resolve) {
+    return new Promise(function (resolve, reject) {
         let request = new XMLHttpRequest();
         let url = 'https://api.spotify.com/v1/search?q=' + artistName + '&type=artist';
         request.open('GET', url, true);
@@ -31,6 +31,7 @@ function getArtist(token, artistName) {
             if (request.status === 200) {
                 resolve(data["artists"]["items"][0]["id"]);
             }
+            reject("no data.");
         };
         request.send();
     });
@@ -54,16 +55,23 @@ function getSongsOfArtist(artistId) {
 function parseTrackAsJson(track) {
 
     var trackInfo = {};
-    trackInfo.name = track["name"];
+    trackInfo.artist = track["artists"][0]["name"];
+    trackInfo.name = track["name"].split(/[-|(]/)[0].trim();
     trackInfo.preview_url = track["preview_url"];
+    trackInfo.genre = "Turkish Pop";
     return trackInfo;
 }
 
-let turkce =[];
-["Tarkan", "Ezhel", "Mustafa Sandal"].map(artist =>
-    getAuthorizationToken()
-        .then(token => getArtist(token, artist))
-        .then(artistId => getSongsOfArtist(artistId))
-        .then(trackList => trackList.map(track => JSON.stringify(track)))
-        .then(data => console.log(data)));
+MongoClient.connect(config.databaseUrl, function (err, db) {
+    if (err) {
+        console.log("A connection problem is occured." + err);
+    }
+    var database = db.db('songStore');
+    var collection = database.collection("turkish_pop");
 
+    dataset.turkishPop.map(artist =>
+        getAuthorizationToken()
+            .then(token => getArtist(token, artist))
+            .then(artistId => getSongsOfArtist(artistId))
+            .then(trackList => collection.insertMany(trackList)));
+});

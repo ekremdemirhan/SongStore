@@ -18,5 +18,8 @@
   "homepage": "https://github.com/ekremdemirhan/SongStore#readme",
   "devDependencies": {
     "xhr2": "^0.1.4"
+  },
+  "dependencies": {
+    "mongodb": "^3.2.3"
   }
 }
